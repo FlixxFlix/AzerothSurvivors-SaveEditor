@@ -23,3 +23,7 @@ jobs:
         run: |
           python tools/make_fixtures.py
           git diff --exit-code
+      - name: Standalone build
+        run: |
+          python tools/build_standalone.py
+          unzip -l dist/AzerothSurvivors-SaveEditor.zip

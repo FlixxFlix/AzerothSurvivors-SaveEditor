@@ -4,11 +4,15 @@ An unofficial editor for save exports of [Azeroth Survivors](https://wow.aethus.
 Load an `RSE1:` export, change gear, stars, collection, marks, zone and heroic progress or any other line,
 then seal it again and import it in the game.
 
-**Open the editor: https://felixkucher.github.io/AzerothSurvivors-SaveEditor/**
+## Download
+
+**[AzerothSurvivors-SaveEditor.zip](https://github.com/FelixKucher/AzerothSurvivors-SaveEditor/releases/latest/download/AzerothSurvivors-SaveEditor.zip)**
+(latest release, about 150 KB)
+
+Unzip it and double-click `AzerothSurvivors-SaveEditor.html`. It is a single file with everything inside:
+no installation, no server, no internet connection. Your save never leaves your computer.
 
 ![The editor with the example save loaded](docs/screenshot.png)
-
-Everything runs in your browser. Your save is never uploaded, and the page makes no third-party requests.
 
 ## How to use it
 
@@ -30,8 +34,6 @@ Everything runs in your browser. Your save is never uploaded, and the page makes
 > [!WARNING]
 > Keep your original export. Importing replaces the save stored in your browser, and it has not been
 > tested which edits the game accepts or corrects.
-
-To use it offline, download the repository and open `index.html`. No server or build step is needed.
 
 ## Command line
 
@@ -74,14 +76,23 @@ each marked as verified, observed or guessed.
 node --test                              # JavaScript: SHA-1 and HMAC against node:crypto, vectors, save model
 python -m unittest discover -s tests     # Python: vectors, tamper detection, CLI
 python tools/make_fixtures.py            # regenerate the example export and tests/vectors.json
+python tools/build_standalone.py         # build dist/AzerothSurvivors-SaveEditor.html and .zip
 ```
+
+While working on the editor, open `index.html` directly; it loads the files in `src/`.
+`tools/build_standalone.py` inlines the stylesheet, the scripts and the fonts into one HTML file and
+packs it with a short README and the licenses.
 
 The JavaScript and Python implementations are written independently. `tests/vectors.json` is produced
 by the Python tool (hashlib/hmac) and must be reproduced byte for byte by `src/rse1.js`.
 
+**Releasing:** bump `version` in `package.json`, commit, then push a matching tag (`git tag v1.1.0 && git push origin v1.1.0`).
+The release workflow runs the tests, builds the ZIP and attaches it to a GitHub release for that tag.
+
 | Path | Content |
 |---|---|
 | `index.html`, `src/` | the editor: `rse1.js` (format), `save.js` (line model), `catalog.js` (game data), `app.js` (UI) |
+| `tools/build_standalone.py` | builds the single-file HTML and the release ZIP |
 | `tools/rse1.py` | command-line decoder and encoder |
 | `docs/FORMAT.md` | format reference |
 | `examples/` | invented example save, plain and sealed |

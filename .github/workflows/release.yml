@@ -1,0 +1,39 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tests
+        run: |
+          node --test
+          python -m unittest discover -s tests
+      - name: Tag matches package.json
+        run: |
+          want="v$(node -p 'require("./package.json").version')"
+          [ "$want" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME, package.json says $want"; exit 1; }
+      - name: Build
+        run: python tools/build_standalone.py "$GITHUB_REF_NAME"
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/AzerothSurvivors-SaveEditor.zip \
+            --title "Azeroth Survivors Save Editor $GITHUB_REF_NAME" \
+            --notes "Download **AzerothSurvivors-SaveEditor.zip**, unzip it and double-click \`AzerothSurvivors-SaveEditor.html\`. Single file, works offline, nothing is uploaded.
+
+          Keep your original export as a backup before importing an edited save. Format notes: [docs/FORMAT.md](https://github.com/${{ github.repository }}/blob/$GITHUB_REF_NAME/docs/FORMAT.md)."

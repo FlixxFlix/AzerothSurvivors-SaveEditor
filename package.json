@@ -5,7 +5,8 @@
   "description": "Unofficial save editor for Azeroth Survivors RSE1 exports",
   "license": "MIT",
   "scripts": {
-    "test": "node --test && python3 -m unittest discover -s tests"
+    "test": "node --test && python3 -m unittest discover -s tests",
+    "build": "python3 tools/build_standalone.py"
   },
   "engines": {
     "node": ">=18"
