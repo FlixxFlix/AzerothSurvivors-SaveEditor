@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Azeroth Survivors Save Editor</title>
+<meta name="description" content="Unofficial save editor for Azeroth Survivors: decode, edit and re-seal RSE1 save exports in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 6v9c0 7.5 5 12.7 12 15 7-2.3 12-7.5 12-15V6z' fill='%237b4f10'/%3E%3Cpath d='M16 7v18M10 13h12' stroke='%23f1e6d2' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Azeroth Survivors · RSE1 · unofficial</div>
+      <h1>Azeroth Survivors Save Editor</h1>
+      <p>Load a save export, change gear, marks, collection and heroic progress, then seal it again and import it in the game.
+        Everything runs in your browser. Nothing is uploaded.</p>
+    </div>
+    <span class="status" id="status" role="status">No save loaded</span>
+  </div>
+
+  <section class="panel load" id="load-panel" aria-labelledby="load-title">
+    <header><h2 id="load-title">Load your export</h2>
+      <span class="note">In the game: Options → Saves → download. Then paste, open or drop the file here.</span></header>
+    <p class="example-note" id="example-note" hidden>You are looking at an <b>example save</b> with an invented hero. Load your own export to edit it.</p>
+    <textarea id="load-text" rows="3" placeholder="Paste an export that starts with RSE1: …" spellcheck="false"></textarea>
+    <div class="row">
+      <button class="btn primary" id="load-btn" type="button">Load pasted export</button>
+      <label class="btn" for="load-file">Open file (.sav / .txt)</label>
+      <input id="load-file" type="file" accept=".sav,.txt" hidden>
+      <button class="btn" id="example-btn" type="button">Load example</button>
+      <button class="btn" id="reset-btn" type="button">Discard changes</button>
+    </div>
+    <p class="err" id="load-err" role="alert" hidden></p>
+  </section>
+
+  <div class="main">
+    <nav class="roster" id="roster" aria-label="Heroes"></nav>
+    <section class="sheet" id="sheet" aria-live="polite"></section>
+  </div>
+
+  <section class="panel" id="account">
+    <header><h2>Account</h2><span class="note">Shared by every hero</span></header>
+    <h3>Statistics</h3>
+    <div class="fields" id="stat-fields"></div>
+    <h3>Perks</h3>
+    <div class="fields" id="perk-fields"></div>
+    <h3>Other account lines</h3>
+    <div class="lines" id="acc-lines"></div>
+  </section>
+
+  <details class="panel" id="raw-panel">
+    <summary>Raw save text</summary>
+    <p class="note">Every line can be edited here. The fields above follow your changes.</p>
+    <textarea id="raw-text" rows="16" spellcheck="false" aria-label="Raw save text"></textarea>
+  </details>
+
+  <section class="panel" id="export">
+    <header><h2>Export</h2><span class="note" id="diff-note"></span></header>
+    <div class="diff" id="diff"></div>
+    <div class="row">
+      <button class="btn primary" id="seal-btn" type="button">Seal</button>
+      <button class="btn" id="copy-btn" type="button" disabled>Copy</button>
+      <button class="btn" id="save-btn" type="button" disabled>Save .sav file</button>
+      <span class="toast" id="toast" role="status"></span>
+    </div>
+    <textarea id="out-text" rows="4" readonly placeholder="The new RSE1 export appears here." aria-label="Sealed export"></textarea>
+    <p class="note">Keep your original export as a backup. Importing replaces the save stored in your browser.</p>
+  </section>
+
+  <footer>
+    Fan tool, not affiliated with the developer of Azeroth Survivors or with Blizzard Entertainment.
+    <a href="https://github.com/FelixKucher/AzerothSurvivors-SaveEditor">Source and format notes on GitHub</a>.
+  </footer>
+</div>
+
+<div class="bar"><div class="in">
+  <span class="count" id="bar-count">No changes</span>
+  <div class="row">
+    <button class="btn" id="bar-raw" type="button">Raw text</button>
+    <button class="btn primary" id="bar-seal" type="button">Seal &amp; export</button>
+  </div>
+</div></div>
+
+<script src="src/rse1.js"></script>
+<script src="src/save.js"></script>
+<script src="src/catalog.js"></script>
+<script src="src/example.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>

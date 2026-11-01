@@ -1,0 +1,13 @@
+{
+  "name": "azeroth-survivors-save-editor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unofficial save editor for Azeroth Survivors RSE1 exports",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test && python3 -m unittest discover -s tests"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
