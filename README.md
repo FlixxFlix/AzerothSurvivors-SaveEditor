@@ -86,8 +86,9 @@ packs it with a short README and the licenses.
 The JavaScript and Python implementations are written independently. `tests/vectors.json` is produced
 by the Python tool (hashlib/hmac) and must be reproduced byte for byte by `src/rse1.js`.
 
-**Releasing:** bump `version` in `package.json`, commit, then push a matching tag (`git tag v1.1.0 && git push origin v1.1.0`).
-The release workflow runs the tests, builds the ZIP and attaches it to a GitHub release for that tag.
+**Releasing:** bump `version` in `package.json` and push to `main`. Then open
+**Actions → release → Run workflow** (or push a matching tag such as `v1.1.0`). The workflow runs the tests,
+creates the tag if needed, builds the ZIP and attaches it to a new GitHub release.
 
 | Path | Content |
 |---|---|

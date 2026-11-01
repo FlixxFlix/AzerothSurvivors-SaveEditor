@@ -1,6 +1,10 @@
 name: release
 
+# Start it from the Actions tab ("Run workflow"), or push a tag like v1.1.0.
+# Either way the version comes from package.json; the workflow creates the tag
+# v<version> if it does not exist yet and attaches the ZIP to a new release.
 on:
+  workflow_dispatch:
   push:
     tags: ["v*"]
 
@@ -22,18 +26,29 @@ jobs:
         run: |
           node --test
           python -m unittest discover -s tests
-      - name: Tag matches package.json
-        run: |
-          want="v$(node -p 'require("./package.json").version')"
-          [ "$want" = "$GITHUB_REF_NAME" ] || { echo "tag $GITHUB_REF_NAME, package.json says $want"; exit 1; }
-      - name: Build
-        run: python tools/build_standalone.py "$GITHUB_REF_NAME"
-      - name: Publish release
+      - name: Version
+        id: version
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/AzerothSurvivors-SaveEditor.zip \
-            --title "Azeroth Survivors Save Editor $GITHUB_REF_NAME" \
+          tag="v$(node -p 'require("./package.json").version')"
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "$tag" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json ($tag)"; exit 1
+          fi
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::release $tag already exists; bump the version in package.json first"; exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - name: Build
+        run: python tools/build_standalone.py "${{ steps.version.outputs.tag }}"
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" dist/AzerothSurvivors-SaveEditor.zip \
+            --target "$GITHUB_SHA" \
+            --title "Azeroth Survivors Save Editor $TAG" \
             --notes "Download **AzerothSurvivors-SaveEditor.zip**, unzip it and double-click \`AzerothSurvivors-SaveEditor.html\`. Single file, works offline, nothing is uploaded.
 
-          Keep your original export as a backup before importing an edited save. Format notes: [docs/FORMAT.md](https://github.com/${{ github.repository }}/blob/$GITHUB_REF_NAME/docs/FORMAT.md)."
+          Keep your original export as a backup before importing an edited save. Format notes: [docs/FORMAT.md](https://github.com/${{ github.repository }}/blob/$TAG/docs/FORMAT.md)."
